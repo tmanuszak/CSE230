@@ -11,7 +11,7 @@
 msg1:   .asciiz     "Enter a value:\n"
 msg2:   .asciiz     "Enter another value:\n"
 msg3:   .asciiz     "Enter one more value:\n"
-msg4:   .asciiz     "\nnum4+num1="
+msg4:   .asciiz     "num4+num1="
 msg5:   .asciiz     "\nnum1-num2="
 msg6:   .asciiz     "\nnum4*num2="
 msg7:   .asciiz     "\nnum1/num3="
@@ -67,7 +67,24 @@ main:
         syscall                         # get num4
         add		$s4, $v0, 0	# $s4 = $v0 + 0 ($s4 = num4)
 
+        # Calculate and print ans1 = num4+num1
+        add             $t1, $s4, $s1   # $t1 = num4 + num1
+        li		$v0, 4		# $v0 = 1
+        la		$a0, msg4	# $a0 = address of msg4
+        syscall                         # print msg4
+        li		$v0, 1		# $v0 = 1
+        add		$a0, $t1, 0	# $a0 = $t1 + 0
+        syscall                         # print ans1
 
+        # Calculate and print ans2 = num1-num2
+        sub             $t2, $s1, $s2   # $t1 = num1 - num2
+        li		$v0, 4		# $v0 = 1
+        la		$a0, msg5	# $a0 = address of msg5
+        syscall                         # print msg5
+        li		$v0, 1		# $v0 = 1
+        add		$a0, $t2, 0	# $a0 = $t2 + 0
+        syscall                         # print ans2
+        
 
-        jr		$ra					# jump to $ra
+        jr		$ra		# jump to $ra
         
