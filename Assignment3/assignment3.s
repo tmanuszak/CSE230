@@ -16,7 +16,7 @@ msg5:   .asciiz     "\nnum1-num2="
 msg6:   .asciiz     "\nnum4*num2="
 msg7:   .asciiz     "\nnum1/num3="
 msg8:   .asciiz     "\nnum3 mod num1="
-msg9:   .asciiz     "\nnum1-num2="
+msg9:   .asciiz     "\n((((num2 mod 4) + num3) * 2) / num4) + num1="
 
 # We will "unofficially" define the following integers and registers as needed
 # $s1 = num1
@@ -28,7 +28,7 @@ msg9:   .asciiz     "\nnum1-num2="
 # $t3 = ans3
 # $t4 = ans4
 # $t5 = ans5
-# $t6 = ans6
+# ans6 (this will alternate between $t6 and $t7 when calculated)
 
         .text
         .globl      main        # define a global function main
@@ -84,7 +84,54 @@ main:
         li		$v0, 1		# $v0 = 1
         add		$a0, $t2, 0	# $a0 = $t2 + 0
         syscall                         # print ans2
+
+        # Calculate and print ans3 = num4*num2
+        mult            $s4, $s2        # num4*num2
+        mflo            $t3             # lower register of ans3 stored in $t3, which is adequate for 4 inputs
+        li		$v0, 4		# $v0 = 1
+        la		$a0, msg6	# $a0 = address of msg6
+        syscall                         # print msg6
+        li		$v0, 1		# $v0 = 1
+        add		$a0, $t3, 0	# $a0 = $t3 + 0
+        syscall                         # print ans3
         
+        # Calculate and print ans4 = num1/num3
+        div             $s1, $s3        # num1 / num3
+        mflo            $t4             # ans4 is the quotient of num1 / num3
+        li		$v0, 4		# $v0 = 1
+        la		$a0, msg7	# $a0 = address of msg7
+        syscall                         # print msg7
+        li		$v0, 1		# $v0 = 1
+        add		$a0, $t4, 0	# $a0 = $t4 + 0
+        syscall                         # print ans4
+
+        # Calculate and print ans4 = num3 mod num1
+        div             $s3, $s1        # num3 / num1
+        mfhi            $t5             # ans5 is the remainder of num3 / num1
+        li		$v0, 4		# $v0 = 1
+        la		$a0, msg8	# $a0 = address of msg8
+        syscall                         # print msg8
+        li		$v0, 1		# $v0 = 1
+        add		$a0, $t5, 0	# $a0 = $t5 + 0
+        syscall                         # print ans5
+
+        # Calculate and print ans6 = ((((num2 mod 4) + num3) * 2) / num4) + num1
+        addi            $t0, 4          # $t0 = 4
+        div             $s2, $t0        # num2 / 4
+        mfhi            $t6             # ans6 is the remainder of num2 / num4
+        add             $t7, $t6, $s3   # ans6 = ans6 + num3
+        addi            $t0, -2         # $t0 = 2
+        mult            $t7, $t0        # ans * 2
+        mflo            $t7             # ans6 is the result of the multiplication
+        div             $t7, $s4        # ans6 / num4
+        mflo            $t7             # ans6 is the quotient of ans6 / num4
+        add             $t6, $t7, $s1   # ans6 = ans6 + num1
+        li		$v0, 4		# $v0 = 1
+        la		$a0, msg9	# $a0 = address of msg9
+        syscall                         # print msg9
+        li		$v0, 1		# $v0 = 1
+        add		$a0, $t6, 0	# $a0 = $t6 + 0
+        syscall                         # print ans6
 
         jr		$ra		# jump to $ra
         
