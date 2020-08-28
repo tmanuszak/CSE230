@@ -122,8 +122,8 @@ main:
         add             $t7, $t6, $s3   # ans6 = ans6 + num3
         addi            $t0, -2         # $t0 = 2
         mult            $t7, $t0        # ans * 2
-        mflo            $t7             # ans6 is the result of the multiplication
-        div             $t7, $s4        # ans6 / num4
+        mflo            $t6             # ans6 is the result of the multiplication
+        div             $t6, $s4        # ans6 / num4
         mflo            $t7             # ans6 is the quotient of ans6 / num4
         add             $t6, $t7, $s1   # ans6 = ans6 + num1
         li		$v0, 4		# $v0 = 1
