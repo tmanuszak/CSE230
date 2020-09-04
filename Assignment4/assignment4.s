@@ -23,55 +23,6 @@ msg7:   .asciiz     "No bill to pay this month.\n"
 # $s3 = month
 # $s4 = billAmount
 
-# int newMeter;
-# int oldMeter;
-# int KWHforMonth;
-# int month;
-# int billAmount;
-
-# printf("Please enter the new electricity meter reading:\n");
-
-# //read an integer from a user input and store it in newMeter
-# scanf("%d", &newMeter);
-
-# printf("Please enter the old electricity meter reading:\n");
-
-# //read an integer from a user input and store it in oldMeter
-# scanf("%d", &oldMeter);
-
-# printf("Please enter a month to compute their electricity bill,\n");
-# printf("Use an integer between 1 and 12 (1 for January, etc.):\n");
-
-# //read an integer from a user input and store it in month
-# scanf("%d", &month);
-
-# KWHforMonth = newMeter - oldMeter;
-
-# if (KWHforMonth <= 0)
-#  {
-#    printf("No bill to pay this month.\n");
-#  }
-# else
-#  {
-#     //compute its bill 
-#     if (KWHforMonth <= 250)
-#      {
-#        billAmount = 25;
-#      }
-#     else if (KWHforMonth > 250 && month >= 6 && month <= 9)
-#      {
-#        billAmount = (KWHforMonth-250)/18 + 25;
-#      }
-#     else
-#      {
-#        billAmount = (KWHforMonth-250)/20 + 25;
-#      }
-
-#     //print out the billAmount
-#     printf("Your total bill amount for this month: %d dollar(s) for %d KWH\n", billAmount,    KWHforMonth);
-
-#   } //end of else
-
         .text
         .globl      main        # define a global function main
 
