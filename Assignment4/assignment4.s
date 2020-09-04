@@ -10,8 +10,7 @@
         .data
 msg1:   .asciiz     "Please enter the new electricity meter reading:\n"
 msg2:   .asciiz     "Please enter the old electricity meter reading:\n"
-msg3:   .asciiz     "Please enter a month to compute their electricity bill,\n
-                        Use an integer between 1 and 12 (1 for January, etc.):\n"
+msg3:   .asciiz     "Please enter a month to compute their electricity bill,\nUse an integer between 1 and 12 (1 for January, etc.):\n"
 msg4:   .asciiz     "Your total bill amount for this month: "
 msg5:   .asciiz     " dollar(s) for "
 msg6:   .asciiz     " KWH\n"
@@ -80,51 +79,48 @@ msg7:   .asciiz     "No bill to pay this month.\n"
 main: 
 
         #Get new meter reading
-        la		$a0, msg1	            # $a0 = address of msg1
-        li		$v0, 4		            # $v0 = 4
+        la	$a0, msg1	        # $a0 = address of msg1
+        li	$v0, 4		        # $v0 = 4
         syscall                         # print msg1
-        li		$v0, 5		            # $v0 = 5
+        li	$v0, 5		        # $v0 = 5
         syscall                         # get newMeter
-        add		$s0, $v0, 0	            # $s0 = $v0 + 0 ($s0 = newMeter)
+        add	$s0, $v0, 0	        # $s0 = $v0 + 0 ($s0 = newMeter)
 
         # Get old meter reading
-        la		$a0, msg2	            # $a0 = address of msg2
-        li		$v0, 4		            # $v0 = 4
+        la	$a0, msg2	        # $a0 = address of msg2
+        li	$v0, 4		        # $v0 = 4
         syscall                         # print msg2
-        li		$v0, 5		            # $v0 = 5
+        li	$v0, 5		        # $v0 = 5
         syscall                         # get oldMeter
-        add		$s1, $v0, 0	            # $s1 = $v0 + 0 ($s1 = oldMeter)
+        add	$s1, $v0, 0	        # $s1 = $v0 + 0 ($s1 = oldMeter)
 
         # Get month
-        la		$a0, msg3	            # $a0 = address of msg3
-        li		$v0, 4		            # $v0 = 4
+        la	$a0, msg3	        # $a0 = address of msg3
+        li	$v0, 4		        # $v0 = 4
         syscall                         # print msg3
-        la		$a0, msg4	            # $a0 = address of msg4
-        li		$v0, 4		            # $v0 = 4
-        syscall                         # print msg4
-        li		$v0, 5		            # $v0 = 5
+        li	$v0, 5		        # $v0 = 5
         syscall                         # get month
-        add		$s3, $v0, 0	            # $s3 = $v0 + 0 ($s3 = month)
+        add	$s3, $v0, 0	        # $s3 = $v0 + 0 ($s3 = month)
 
         #Calculate KWHforMonth
-        sub		$s2, $s0, $s1		    # $s2 = $s0 - $s1 (KWHforMonth = newMeter - oldMeter)
+        sub	$s2, $s0, $s1		# $s2 = $s0 - $s1 (KWHforMonth = newMeter - oldMeter)
 
-        #Check if KWHforMonth < 0
-        slt     $t0, $s2, $zero         #if KWHforMonth < 0: $t0 = 1, ekse 0
-        beq		$t0, $zero, continue0	# if $t0 = $zero then continue
+        #Check if KWHforMonth <= 0
+        slt     $t0, $zero, $s2         #if KWHforMonth < 0: $t0 = 1, ekse 0
+        bne	$t0, $zero, continue0	# if $t0 = $zero then continue
         # do if KWHforMonth < 0
-        la		$a0, msg3	            # $a0 = address of msg3
-        li		$v0, 4		            # $v0 = 4
-        syscall                         # print msg3
-        jr		$ra		                # jump to $ra
+        la	$a0, msg7	        # $a0 = address of msg7
+        li	$v0, 4		        # $v0 = 4
+        syscall                         # print msg7
+        jr	$ra		        # jump to $ra
 
 continue0:
-        addi	$t0, $zero, 250			# $t0 = $zero + 250
+        addi	$t0, $zero, 250		# $t0 = $zero + 250
         slt     $t1, $t0, $s2           # if 250 < KWHforMonth: $t1 = 1, else 0
-        beq     $t1, $zero, continue1   # if $t1 != $zero then continue1
+        bne     $t1, $zero, continue1   # if $t1 != $zero then continue1
         # do if KWHforMonth <= 250
         addi    $s4, $zero, 25          # billAmount = 25
-        j		exitprint				# jump to exitprint
+        j	exitprint		# jump to exitprint
 
 continue1:        
         addi    $t0, $zero, 6           # $t0 = 6
@@ -133,10 +129,10 @@ continue1:
         # set billAmount = (KWHforMonth-250)/20 + 25;
         addi    $s4, $s2, -250          # billAmount = KWHforMonth - 250
         addi    $t1, $zero, 20          # t1 = 20
-        div		$s4, $t1			    # $s4 / $t1
-        mflo	$s4					    # billAmount = floor($s4 / $t1)
+        div	$s4, $t1		# $s4 / $t1
+        mflo	$s4			# billAmount = floor($s4 / $t1)
         addi    $s4, $s4, 25            # billAmount += 25
-        j		exitprint				# jump to exitprint
+        j	exitprint		# jump to exitprint
 
 continue2: 
         addi    $t0, $zero, 9           # $t0 = 6
@@ -145,32 +141,35 @@ continue2:
         # set billAmount = (KWHforMonth-250)/20 + 25;
         addi    $s4, $s2, -250          # billAmount = KWHforMonth - 250
         addi    $t1, $zero, 20          # t1 = 20
-        div		$s4, $t1			    # $s4 / $t1
-        mflo	$s4					    # billAmount = floor($s4 / $t1)
+        div	$s4, $t1	        # $s4 / $t1
+        mflo	$s4			# billAmount = floor($s4 / $t1)
         addi    $s4, $s4, 25            # billAmount += 25
-        j		exitprint				# jump to exitprint
+        j	exitprint		# jump to exitprint
 
 continue3: 
         # set billAmount = (KWHforMonth-250)/18 + 25;
         addi    $s4, $s2, -250          # billAmount = KWHforMonth - 250
         addi    $t1, $zero, 18          # t1 = 18
-        div		$s4, $t1			    # $s4 / $t1
-        mflo	$s4					    # billAmount = floor($s4 / $t1)
+        div	$s4, $t1		# $s4 / $t1
+        mflo	$s4			# billAmount = floor($s4 / $t1)
         addi    $s4, $s4, 25            # billAmount += 25
-        j		exitprint				# jump to exitprint
+        j	exitprint		# jump to exitprint
 
 exitprint:
-        la		$a0, msg4	            # $a0 = address of msg4
+        la	$a0, msg4	        # $a0 = address of msg4
+        li	$v0, 4		        # $v0 = 4
         syscall                         # print msg4
-        li		$v0, 1		            # $v0 = 1
-        add		$a0, $s4, 0	            # $a0 = $s4 + 0
+        li	$v0, 1		        # $v0 = 1
+        add	$a0, $s4, 0	        # $a0 = $s4 + 0
         syscall                         # print billAmount
-        la		$a0, msg5	            # $a0 = address of msg5
+        la	$a0, msg5	        # $a0 = address of msg5
+        li	$v0, 4		        # $v0 = 4
         syscall                         # print msg5
-        li		$v0, 1		            # $v0 = 1
-        add		$a0, $s2, 0	            # $a0 = $s4 + 0
+        li	$v0, 1		        # $v0 = 1
+        add	$a0, $s2, 0	        # $a0 = $s4 + 0
         syscall                         # print KWHforMonth
-        la		$a0, msg6	            # $a0 = address of msg6
+        la	$a0, msg6	        # $a0 = address of msg6
+        li	$v0, 4		        # $v0 = 1
         syscall                         # print msg6
         jr      $ra                     # jump to $ra
 
