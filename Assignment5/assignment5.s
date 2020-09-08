@@ -12,6 +12,7 @@ msg1:   .asciiz     "Enter an ending index:\n"
 msg2:   .asciiz     "Enter an integer:\n"
 msg3:   .asciiz     "Enter another integer:\n"
 msg4:   .asciiz     "Result Array Content:\n"
+msg5:   .asciiz     "\n"
 numbers_len:        .word     11
 numbers:            .word     2, 19, 23, -7, 15, -17, 11, -4, 23, -26, 27
 
@@ -29,7 +30,7 @@ numbers:            .word     2, 19, 23, -7, 15, -17, 11, -4, 23, -26, 27
 # The program begins execution at main()
 main:
         la		$s4, numbers		    # $s4 = base address of numbers
-        la      $t0, num1               # $t0 = address of num1
+        la      $t0, numbers_len        # $t0 = address of numbers_len
         lw		$s5, 0($t0)             # $s5 =  numbers_len
         
         # Get endingIndex
@@ -65,8 +66,8 @@ main:
 
 # At this point num1 will always be less or equals to num2.
 # Now, change the array content.
-loop:
         li      $s3, 0                  # $s3 = j = 0
+loop:
         slt     $t0, $s3, $s0           # $t0 = 1 if j < ending index, else $t0 = 0
         beq     $t0, $zero, exitprint   # if $t0 = $zero then exitprint
         slt     $t0, $s3, $s5           # $t0 = 1 if j < numbers_len, else $t0 = 0
@@ -94,12 +95,12 @@ brokeif:
         j		loop				    # jump to loop
         
 exitprint:
-        la	    $a0, msg1	            # $a0 = address of msg4
+        la	    $a0, msg4	            # $a0 = address of msg4
         li	    $v0, 4		            # $v0 = 4
         syscall                         # print msg4
+        li      $s3, 0                  # $s3 = j = 0
 
 printarray:
-        li      $s3, 0                  # $s3 = j = 0
         slt     $t0, $s3, $s5           # $t0 = 1 if j < numbers_len, else $t0 = 0
         beq		$t0, $zero, exit	    # if $t0 == $zero then exit
 
@@ -108,7 +109,10 @@ printarray:
         add     $t2, $t1, $s4           # $t2 = address of numbers[j]
         lw		$a0, 0($t2)		        # $t3 = numbers[j]
         li		$v0, 1		            # $v0 = 1
-        syscall
+        syscall                         # print numbers[j]
+        la	    $a0, msg5	            # $a0 = address of msg5
+        li	    $v0, 4		            # $v0 = 4
+        syscall                         # print new line        
         addi    $s3, $s3, 1             # $s3 = $s3 + 1
         j		printarray				# jump to printarray
         
