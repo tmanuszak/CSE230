@@ -143,10 +143,3 @@ printNumber:
 exit:
         jr	$ra			# jump to $ra
         
-
-
-
-
-        
-        
-
