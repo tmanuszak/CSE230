@@ -57,21 +57,26 @@ numbers:        .word   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 main: 
         li      $s0, 12             # $s0 = arraySize = 12
         la      $s1, numbers        # $s1 = base address of numbers
+
+        # call readArray
         addi    $sp, $sp, -4        # $sp -= 4
         sw		$ra, 0($sp)		    # store $ra
         jal		readArray			# jump to readArray and save position to $ra
         lw		$ra, 0($sp)		    # load $ra
         addi    $sp, $sp, 4         # $sp += 4
-        
-        
 
-        # Get number of ints to be stored in numbers
-        la      $a0, msg1	        # $a0 = address of msg1
+        la      $a0, msg4	        # $a0 = address of msg4
         li	    $v0, 4		        # $v0 = 4
-        syscall                     # print msg1
-        li	    $v0, 5		        # $v0 = 5
-        syscall                     # get numbersSize
-        add	    $s0, $v0, 0	        # $s0 = $v0 + 0 ($s0 = numbersSize)
+        syscall                     # print msg4
+
+        # call printArray
+        addi    $sp, $sp, -4        # $sp -= 4
+        sw		$ra, 0($sp)		    # store $ra
+        jal		printArray			# jump to printArray and save position to $ra
+        lw		$ra, 0($sp)		    # load $ra
+        addi    $sp, $sp, 4         # $sp += 4
+        
+        
 
 # //The changeArrayContent reads in an integer
 # //Then it goes through the parameter array, and if an element
@@ -120,7 +125,30 @@ changeArrayContent:
     
 #     return;
 # }
+# Parameters
+# $s0 = arraySize = 12
+# $s1 = base address of array
+# $s2 = length
+# $t0 = loop counter
 printArray:
+        li  $t0, 0                          # Reset loop counter
+
+printArrayLoop:
+        # while i < arraySize && i < length check
+        slt     $t1, $t0, $s0               # if i < arraySize, $t1 = 1, else $t0 = 0
+        beq		$t1, $zero, exitPrintArray  # if $t0 == $zero then exitPrintArray
+        slt     $t1, $t0, $s2               # if i < length, $t1 = 1, else $t0 = 0
+        beq     $t1, $zero, exitPrintArray  # if $t0 == $zero then exitPrintArray
+        sll     $t0, $t0, 2                 # $t9 = counter * 4 (address of numbers[counter])
+        add     $t8, $t9, $s1               # $t8 = $t9 + $s1 (address of numbers[counter])
+        lw	    $a0, 0($t8)                 # load new integer in numbers[counter]
+        li      $v0, 1                      # $v0 = 1
+        syscall                             # print numbers[counter]
+        addi    $t0, $t0, 1                 # increment loop counter
+        j		printArrayLoop				# jump to printArrayLoop
+
+exitPrintArray:
+        jr		$ra					        # jump to $ra
 
 # int readArray(int array[], int arraysize)
 # {
@@ -158,19 +186,19 @@ readArray:
         add	    $s2, $v0, 0	                # $s2 = $v0 + 0 ($s2 = length)
 
 readArrayLoop:
-        #while i < arraySize && i < length check
+        # while i < arraySize && i < length check
         slt     $t1, $t0, $s0               # if i < arraySize, $t1 = 1, else $t0 = 0
         beq		$t1, $zero, exitReadArray   # if $t0 == $zero then exitReadArray
-        slt     $t1, $t0, $s2               # # if i < length, $t1 = 1, else $t0 = 0
+        slt     $t1, $t0, $s2               # if i < length, $t1 = 1, else $t0 = 0
         beq     $t1, $zero, exitReadArray   # if $t0 == $zero then exitReadArray
         la      $a0, msg2	                # $a0 = address of msg2
         li	    $v0, 4		                # $v0 = 4
         syscall                             # print msg2
         li	    $v0, 5		                # $v0 = 5
         syscall                             # get num
-        sll     $t9, $t0, 2                 # $t8 = counter * 4 (address of numbers[counter])
-        add     $t8, $t9, $s1               # $t8 = $t8 + $s1 (address of numbers[counter])
-        lw	    $a0, 0($t8)                 # load new integer in numbers[counter]
+        sll     $t9, $t0, 2                 # $t9 = counter * 4 (address of numbers[counter])
+        add     $t8, $t9, $s1               # $t8 = $t9 + $s1 (address of numbers[counter])
+        sw	    $v0, 0($t8)                 # store new integer in numbers[counter]
         addi    $t0, $t0, 1                 # increment loop counter
         j		readArrayLoop				# jump to readArrayLoop
         
