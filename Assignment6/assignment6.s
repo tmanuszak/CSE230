@@ -12,134 +12,182 @@
 msg1:           .asciiz "Specify how many numbers should be stored in the array (at most 11):\n"
 msg2:           .asciiz "Enter an integer: \n"
 msg3:           .asciiz "Result Array Content:\n"
-msg4:           .asciiz "Original Array Content:"
-msg5:           .asciiz "\nSpecify how many times to repeat:\n"
+msg4:           .asciiz "Original Array Content:\n"
+msg5:           .asciiz "Specify how many times to repeat:\n"
 newline:        .asciiz "\n"
 numbers:        .word   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
-# We will unofficially declare the following variables
-# $s0 = numbersSize (How many numbers the user wants to input)
-# $t9 = counter for looping
-# $s1 = base address of numbers
-# $s2 = times to repeat
-# $s3 = divisor
 
         .text
         .globl      main        # define a global function main
 
-# The main reads in an array content,
-# then it prints it,
-# then it asks a user how many time to repeat
-# the changeArrayContent operation. 
+# Parameters
+# $s0 = arraySize = 12
+# $s1 = base address of array
+# $s2 = length
+# $s3 = howMany
+# $t0 = loop counter
 main: 
-        la      $s1, numbers            # $s1 = base address of numbers
+        li      $s0, 12                         # $s0 = arraySize = 12
+        la      $s1, numbers                    # $s1 = base address of numbers
 
-        # Get number of ints to be stored in numbers
-        la      $a0, msg1	        # $a0 = address of msg1
-        li	$v0, 4		        # $v0 = 4
-        syscall                         # print msg1
-        li	$v0, 5		        # $v0 = 5
-        syscall                         # get numbersSize
-        add	$s0, $v0, 0	        # $s0 = $v0 + 0 ($s0 = numbersSize)
-        li      $t9, 0                  # counter = 0
+        # call readArray
+        addi    $sp, $sp, -4                    # $sp -= 4
+        sw	$ra, 0($sp)		        # store $ra
+        jal	readArray			# jump to readArray and save position to $ra
+        lw      $ra, 0($sp)		        # load $ra
+        addi    $sp, $sp, 4                     # $sp += 4
 
-# Loop to fill numbers with user input
-fillArrayLoop:
-        slt     $t0, $t9, $s0           # $t0 = 1 if counter < numberSize, else $t0 = 0
-        beq     $t0, $zero, continue    # if $t0 = 0, continue
+        la      $a0, msg4	                # $a0 = address of msg4
+        li	$v0, 4		                # $v0 = 4
+        syscall                                 # print msg4
 
-        # Get int from user
-        la	$a0, msg2	        # $a0 = address of msg2
-        li	$v0, 4		        # $v0 = 4
-        syscall                         # print msg2
-        li	$v0, 5		        # $v0 = 5
-        syscall                         # get int
-        sll     $t8, $t9, 2             # $t8 = counter * 4 
-        add     $t8, $t8, $s1           # $t8 = $t8 + $s1 (address of numbers[counter])
-        sw	$v0, 0($t8)             # store new integer in numbers[counter]
-        addi	$t9, $t9, 1		# $t9 = $t9 + 1 (increment counter)
-        j	fillArrayLoop		# jump to fillArrayLoop
+        # call printArray
+        addi    $sp, $sp, -4                    # $sp -= 4
+        sw	$ra, 0($sp)		        # store $ra
+        jal	printArray			# jump to printArray and save position to $ra
+        lw	$ra, 0($sp)		        # load $ra
+        addi    $sp, $sp, 4                     # $sp += 4
 
-continue:
-        li	$t9, 0		        # $t9 = 0 (reset counter)
-        la	$a0, msg4	        # $a0 = address of msg4
-        li	$v0, 4		        # $v0 = 4
-        syscall                         # print msg4
+        # get howMany
+        la      $a0, msg5	                # $a0 = address of msg5
+        li	$v0, 4		                # $v0 = 4
+        syscall                                 # print msg5
+        li	$v0, 5		                # $v0 = 5
+        syscall                                 # get howMany
+        add     $s3, $v0, $zero                 # $s3 = howMany
+        li      $t0, 0                          # reset loop counter
 
-        # Loop to print original numbers array
-printOriginal:
-        slt     $t0, $t9, $s0           # $t0 = 1 if counter < numberSize, else $t0 = 0
-        beq     $t0, $zero, continue1   # if $t0 = 0, continue1
-        # print newline
-        la      $a0, newline            # $a0 = address of newline
-        li	$v0, 4		        # $v0 = 4
-        syscall                         # print newline
-        sll     $t8, $t9, 2             # $t8 = counter * 4 (address of numbers[counter])
-        add     $t8, $t8, $s1           # $t8 = $t8 + $s1 (address of numbers[counter])
-        lw	$a0, 0($t8)             # load new integer in numbers[counter]
-        li      $v0, 1                  # $v0 = 1
-        syscall                         # print numbers[counter]
-        addi	$t9, $t9, 1		# $t9 = $t9 + 1 (increment array counter)
-        j	printOriginal		# jump to printOriginal
+mainLoop:
+        # check i < howMany
+        slt     $t1, $t0, $s3                   # if i < howMany, $t1 = 1, else $t0 = 0
+        beq     $t1, $zero, exitMain            # if $t1 == $zero, exitMain
 
-        # ask user how many times to change array
-continue1:
-        la	$a0, msg5	        # $a0 = address of msg5
-        li	$v0, 4		        # $v0 = 4
-        syscall                         # print msg5
-        li	$v0, 5		        # $v0 = 5
-        syscall                         # get times to repeat
-        add	$s2, $v0, 0	        # $s2 = $v0 + 0 ($s2 = times to repeat)
-        li      $t7, -1                 # set repeat counter
+        # call changeArray
+        addi    $sp, $sp, -8                    # $sp -= 8
+        sw      $ra, 0($sp)                     # store $ra
+        sw      $t0, 4($sp)                     # store loop counter
+        jal     changeArray                     # jump to changeArray and save position to $ra
+        lw      $t0, 4($sp)                     # load loop counter
+        lw      $ra, 0($sp)                     # load $ra
+        addi    $sp, $sp, 8                     # $sp += 8
 
-        # Loop to get the divisor to check the numbers array with
-getDivisor:
-        addi	$t7, $t7, 1		# $t7 = $t7 + 1
-        slt     $t0, $t7, $s2           # $t0 = 1 if counter < times to repeat, else $t0 = 0
-        beq     $t0, $zero, exit        # if $t0 = 0, exit
-        la	$a0, msg2	        # $a0 = address of msg2
-        li	$v0, 4	        	# $v0 = 4
-        syscall                         # print msg2
-        li	$v0, 5	        	# $v0 = 5
-        syscall                         # get divisor
-        add	$s3, $v0, 0	        # $s3 = $v0 + 0 ($s3 = divisor)
-        li      $t9, 0                  # reset array counter
-        # print result array message
-        la	$a0, msg3	        # $a0 = address of msg3
-        li	$v0, 4		        # $v0 = 4
-        syscall                         # print msg3
+        addi    $t0, $t0, 1                     # increment loop counter
+        j	mainLoop			# jump to mainLoop
 
-        # check if numbers[counter]
-changeArray:
-        slt     $t0, $t9, $s0           # $t0 = 1 if counter < numberSize, else $t0 = 0
-        beq     $t0, $zero, getDivisor  # if $t0 = 0, getDivisor
-        sll     $t8, $t9, 2             # $t8 = counter * 4 (address of numbers[counter])
-        add     $t8, $t8, $s1           # $t8 = $t8 + $s1 (address of numbers[counter])
-        lw	$a0, 0($t8)             # load integer in numbers[counter]
-        div	$a0, $s3		# $a0 / $s3
-        mfhi    $a1
-        bne	$a1, $zero, printNumber	# if $a1 != $zero then printNumber
-        # numbers[counter] = numbers[counter] * divisor
-        mult	$a0, $s3	        # $a0 * $s3 = Hi and Lo registers
-        mflo	$a0			# copy Lo to $a0
-        sll     $t8, $t9, 2             # $t8 = counter * 4 
-        add     $t8, $t8, $s1           # $t8 = $t8 + $s1 (address of numbers[counter])
-        sw	$a0, 0($t8)             # store new integer in numbers[counter]
+exitMain:
+        jr      $ra                             # exit program
 
-        # print numbers[counter]
-printNumber:                         
-        sll     $t8, $t9, 2             # $t8 = counter * 4 
-        add     $t8, $t8, $s1           # $t8 = $t8 + $s1 (address of numbers[counter])
-        lw	$a0, 0($t8)	        # $a0 = numbers[counter]
-        li      $v0, 1                  # $v0 = 1
-        syscall                         # print numbers[counter]
-        la      $a0, newline            # $a0 = address of newline
-        li	$v0, 4		        # $v0 = 4
-        syscall                         # print newline
-        addi    $t9, $t9, 1             # $t9 = $t9 + 1
-        j	changeArray		# jump to changeArray
+# Parameters
+# $s0 = arraySize = 12
+# $s1 = base address of array
+# $s2 = length
+# $s4 = divisor
+# $t0 = loop counter
+changeArray: 
+        la      $a0, msg2	                # $a0 = address of msg2
+        li	$v0, 4		                # $v0 = 4
+        syscall                                 # print msg2
+        li	$v0, 5		                # $v0 = 5
+        syscall                                 # get divisor
+        add     $s4, $v0, $zero                 # $s4 = divisor
+        li      $t0, 0                          # reset loop counter
+
+changeArrayLoop:
+        # while i < arraySize && i < length check
+        slt     $t1, $t0, $s0                   # if i < arraySize, $t1 = 1, else $t0 = 0
+        beq	$t1, $zero, exitChangeArray     # if $t0 == $zero then exitChangeArray
+        slt     $t1, $t0, $s2                   # if i < length, $t1 = 1, else $t0 = 0
+        beq     $t1, $zero, exitChangeArray     # if $t0 == $zero then exitChangeArray
+
+        # check numbers[$t0] % divisor == 0
+        sll     $t9, $t0, 2                     # $t9 = counter * 4 (address of numbers[counter])
+        add     $t8, $t9, $s1                   # $t8 = $t9 + $s1 (address of numbers[counter])
+        lw	$a0, 0($t8)                     # load new integer in numbers[counter]
+        div	$a0, $s4		        # $a0 / $s4
+        mfhi	$t2			        # $t2 = $a0 mod $s4 
+        bne	$t2, $zero, incChangeLoop	# if $t2 != $zero then incChangeLoop
+
+        # numbers[$t0] = numbers[$t0]*num1
+        mult	$a0, $s4			# $a0 * $s4 = Hi and Lo registers
+        mflo	$a0				# copy Lo to $a0
+        sw      $a0, 0($t8)                     # store numbers[$t0] = numbers[$t0]*num1
         
+incChangeLoop:
+        addi	$t0, $t0, 1			# increment loop counter
+        j	changeArrayLoop		        # jump to changeArrayLoop
+
+exitChangeArray:
+        la      $a0, msg3	                # $a0 = address of msg3
+        li	$v0, 4		                # $v0 = 4
+        syscall                                 # print msg3
+
+        # call printArray
+        addi    $sp, $sp, -4                    # $sp -= 4
+        sw	$ra, 0($sp)		        # store $ra
+        jal	printArray			# jump to printArray and save position to $ra
+        lw	$ra, 0($sp)		        # load $ra
+        addi    $sp, $sp, 4                     # $sp += 4
+
+        jr	$ra				# jump to $ra
+
+# Parameters
+# $s0 = arraySize = 12
+# $s1 = base address of array
+# $s2 = length
+# $t0 = loop counter
+printArray:
+        li      $t0, 0                          # Reset loop counter
+
+printArrayLoop:
+        # while i < arraySize && i < length check
+        slt     $t1, $t0, $s0                   # if i < arraySize, $t1 = 1, else $t0 = 0
+        beq	$t1, $zero, exitPrintArray      # if $t0 == $zero then exitPrintArray
+        slt     $t1, $t0, $s2                   # if i < length, $t1 = 1, else $t0 = 0
+        beq     $t1, $zero, exitPrintArray      # if $t0 == $zero then exitPrintArray
+        sll     $t9, $t0, 2                     # $t9 = counter * 4 (address of numbers[counter])
+        add     $t8, $t9, $s1                   # $t8 = $t9 + $s1 (address of numbers[counter])
+        lw	$a0, 0($t8)                     # load new integer in numbers[counter]
+        li      $v0, 1                          # $v0 = 1
+        syscall                                 # print numbers[counter]
+        la      $a0, newline                    # $a0 = address of newline
+        li	$v0, 4		                # $v0 = 4
+        syscall                                 # print newline
+        addi    $t0, $t0, 1                     # increment loop counter
+        j	printArrayLoop			# jump to printArrayLoop
+
+exitPrintArray:
+        jr	$ra	                        # jump to $ra
+
+# Parameters
+# $s0 = arraySize = 12
+# $s1 = base address of array
+# $s2 = length
+# $s3 = how many times to repeat change
+# $t0 = loop counter 
+readArray:
+        la      $a0, msg1	                # $a0 = address of msg1
+        li	$v0, 4		                # $v0 = 4
+        syscall                                 # print msg1
+        li	$v0, 5		                # $v0 = 5
+        syscall                                 # get length
+        add	$s2, $v0, 0	                # $s2 = $v0 + 0 ($s2 = length)
+
+readArrayLoop:
+        # while i < arraySize && i < length check
+        slt     $t1, $t0, $s0                   # if i < arraySize, $t1 = 1, else $t0 = 0
+        beq	$t1, $zero, exitReadArray       # if $t0 == $zero then exitReadArray
+        slt     $t1, $t0, $s2                   # if i < length, $t1 = 1, else $t0 = 0
+        beq     $t1, $zero, exitReadArray       # if $t0 == $zero then exitReadArray
+        la      $a0, msg2	                # $a0 = address of msg2
+        li	$v0, 4		                # $v0 = 4
+        syscall                                 # print msg2
+        li	$v0, 5		                # $v0 = 5
+        syscall                                 # get num
+        sll     $t9, $t0, 2                     # $t9 = counter * 4 (address of numbers[counter])
+        add     $t8, $t9, $s1                   # $t8 = $t9 + $s1 (address of numbers[counter])
+        sw	$v0, 0($t8)                     # store new integer in numbers[counter]
+        addi    $t0, $t0, 1                     # increment loop counter
+        j       readArrayLoop			# jump to readArrayLoop
         
-exit:
-        jr	$ra			# jump to $ra
-        
+exitReadArray:
+        jr	$ra			        # jump to $ra
