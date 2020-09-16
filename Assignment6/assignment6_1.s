@@ -12,7 +12,7 @@
 msg1:           .asciiz "Specify how many numbers should be stored in the array (at most 11):\n"
 msg2:           .asciiz "Enter an integer: \n"
 msg3:           .asciiz "Result Array Content:\n"
-msg4:           .asciiz "Original Array Content:"
+msg4:           .asciiz "Original Array Content:\n"
 msg5:           .asciiz "\nSpecify how many times to repeat:\n"
 newline:        .asciiz "\n"
 numbers:        .word   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -75,6 +75,8 @@ main:
         jal		printArray			# jump to printArray and save position to $ra
         lw		$ra, 0($sp)		    # load $ra
         addi    $sp, $sp, 4         # $sp += 4
+
+        jr      $ra                 # exit program
         
         
 
@@ -139,11 +141,14 @@ printArrayLoop:
         beq		$t1, $zero, exitPrintArray  # if $t0 == $zero then exitPrintArray
         slt     $t1, $t0, $s2               # if i < length, $t1 = 1, else $t0 = 0
         beq     $t1, $zero, exitPrintArray  # if $t0 == $zero then exitPrintArray
-        sll     $t0, $t0, 2                 # $t9 = counter * 4 (address of numbers[counter])
+        sll     $t9, $t0, 2                 # $t9 = counter * 4 (address of numbers[counter])
         add     $t8, $t9, $s1               # $t8 = $t9 + $s1 (address of numbers[counter])
         lw	    $a0, 0($t8)                 # load new integer in numbers[counter]
         li      $v0, 1                      # $v0 = 1
         syscall                             # print numbers[counter]
+        la      $a0, newline                # $a0 = address of newline
+        li	    $v0, 4		                # $v0 = 4
+        syscall                             # print newline
         addi    $t0, $t0, 1                 # increment loop counter
         j		printArrayLoop				# jump to printArrayLoop
 
