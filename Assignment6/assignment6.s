@@ -20,12 +20,16 @@ numbers:        .word   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         .text
         .globl      main        # define a global function main
 
+############################################################################
+# Procedure/Function: main
+# Description: main function calls various methods to manipulate and print the array
 # Parameters
 # $s0 = arraySize = 12
 # $s1 = base address of array
 # $s2 = length
 # $s3 = howMany
 # $t0 = loop counter
+############################################################################
 main: 
         li      $s0, 12                         # $s0 = arraySize = 12
         la      $s1, numbers                    # $s1 = base address of numbers
@@ -77,12 +81,16 @@ mainLoop:
 exitMain:
         jr      $ra                             # exit program
 
+############################################################################
+# Procedure/Function: changeArray
+# Description: changeArray checks if numbers[$t0] % divisor == 0. If so, numbers[$t0] *= divisor.
 # Parameters
 # $s0 = arraySize = 12
 # $s1 = base address of array
 # $s2 = length
 # $s4 = divisor
 # $t0 = loop counter
+############################################################################
 changeArray: 
         la      $a0, msg2	                # $a0 = address of msg2
         li	$v0, 4		                # $v0 = 4
@@ -130,11 +138,15 @@ exitChangeArray:
 
         jr	$ra				# jump to $ra
 
+############################################################################
+# Procedure/Function: printArray
+# Description: prints the numbers array that $s1 points to
 # Parameters
 # $s0 = arraySize = 12
 # $s1 = base address of array
 # $s2 = length
 # $t0 = loop counter
+############################################################################
 printArray:
         li      $t0, 0                          # Reset loop counter
 
@@ -158,12 +170,16 @@ printArrayLoop:
 exitPrintArray:
         jr	$ra	                        # jump to $ra
 
+############################################################################
+# Procedure/Function: readArray
+# Description: reads input from user to fill numbers array
 # Parameters
 # $s0 = arraySize = 12
 # $s1 = base address of array
 # $s2 = length
 # $s3 = how many times to repeat change
 # $t0 = loop counter 
+############################################################################
 readArray:
         la      $a0, msg1	                # $a0 = address of msg1
         li	$v0, 4		                # $v0 = 4
