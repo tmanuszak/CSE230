@@ -3,7 +3,8 @@
 #  Name: Trey Manuszak
 #  ASU email: tmanusza@asu.edu
 #  Course: CSE230 TTh 6-730pm
-#  Description: 
+#  Description: Get n from user and calculate then print function1(n) defined as 
+#               5*n + 14 if n <= 3, function1(n-1)/n + n*function1(n-3) + 4*n else.
 ###########################################################
 
         .data
