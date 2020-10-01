@@ -1,0 +1,220 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Do not alter this block of commands.  If you're proficient at LaTeX, you may include additional packages, create macros, etc. immediately below this block of commands, but make sure to NOT alter the header, margin, and comment settings here. 
+\documentclass[12pt]{article}
+\usepackage[margin=1in, bottom=4.5cm]{geometry}
+\usepackage{amsmath,amsthm,amssymb,amsfonts, enumitem, fancyhdr, color, comment, graphicx, environ, scrextend, mathtools, yfonts, pdfpages}
+\usepackage[table,dvipsnames]{xcolor}
+\usepackage{tikz}  
+\usepackage{tikz-3dplot} 
+\usepackage{amssymb}
+\usepackage{xifthen}
+\pagestyle{fancy}
+\setlength{\headheight}{65pt}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries
+#2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}} 
+\newenvironment{proposition}[2][Proposition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2}]}{\end{trivlist}}
+\newenvironment{example}[2][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2}]}{\end{trivlist}}
+\newenvironment{definition}[2][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2}]}{\end{trivlist}}  
+\newenvironment{sol}
+    {\emph{Proof.}
+    }
+    {
+    \qed
+    }
+\specialcomment{com}{ \color{blue} \textbf{Comment:} }{\color{black}} %for instructor comments while grading
+\NewEnviron{probscore}{\marginpar{ \color{blue} \tiny Problem Score: \BODY \color{black} }}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand\restr[2]{{% we make the whole thing an ordinary symbol
+  \left.\kern-\nulldelimiterspace % automatically resize the bar with \right
+  #1 % the function
+  \vphantom{\big|} % pretend it's a little taller at normal size
+  \right|_{#2} % this is the delimiter
+  }}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fill in the appropriate information below
+\lhead{Trey Manuszak}  %replace with your name
+\rhead{CSE230: Computer Organization and Assembly Language \\ Homework 8} %replace XYZ with the homework course number, semester (e.g. ``Spring 2019"), and assignment number.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{blindtext}
+\title{CSE230: Computer Organization and Assembly Language}
+\date{September 28, 2020}
+\author{Trey Manuszak \\ tmanusza@asu.edu \\ Arizona State University}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Do not alter this block.
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitle
+\newpage
+
+
+%Copy the following block of text for each problem in the assignment.
+\begin{problem}{1}
+Perform a multiplication of two binary numbers (multiplicand 0110 and multiplier 0110) by creating a table to show steps taken, multiplicand register value, multiplier register value and product register value for each iteration by following the steps described in the following document.
+\end{problem}
+
+\textit{Solution.}
+\begin{table}[!htbp]
+\begin{center}
+    \scalebox{0.75}{\begin{tabular}{c|p{6cm}|c|c|c|}
+Iteration & Step                                                                                                                           & Multiplicand Value & Multiplier Value & Product Value           \\ \hline
+0         & Initial Values                                                                                                                 & 0110               & 0110             & 0                       \\ \hline
+1         & 2. sll Multiplicand by 1 \newline 3. srl Multiplier by 1                                                        & 01100              & 011              & 0                       \\ \hline
+2         & 1a. Prod = Prod + Multiplicand \newline 2. sll Multiplicand by 1 \newline 3. srl Multiplier by 1 & 011000             & 01               & 0 + 01100 = 01100       \\ \hline
+3         & 1a. Prod = Prod + Multiplicand \newline 2. sll Multiplicand by 1 \newline 3. srl Multiplier by 1 & 0110000            & 0                & 01100 + 011000 = 100100 \\ \hline
+4         & 2. sll Multiplicand by 1 \newline 3. srl Multiplier by 1                                                        & 0110000            & -                & \textcolor{red}{100100}                  \\ \hline
+\end{tabular}}
+\end{center}
+\end{table}
+
+\begin{problem}{2}
+Perform a division of two binary numbers (divide 0011 0110 by 0110) by creating a table to show steps taken, quotient register value, divisor register value and remainder register value for each iteration by following the steps described in the following document.
+\end{problem}
+
+\textit{Solution.}
+\begin{table}[!htbp]
+\begin{center}
+    \scalebox{0.9}{\begin{tabular}{c|p{8cm}|p{1.5cm}|p{2cm}|p{2cm}|}
+Iteration & Step                                                                                                                         & Quotient                                                       & Divisor                                                                    & Remainder                                                                  \\ \hline
+0         & Initial Values                                                                                                               & 0000                                                           & 01100000                                                                   & 00110110                                                                   \\ \hline
+1         & 1. Rem = Rem - Div \newline 2b. Rem \textless 0, Rem += Div, sll Q, Q0 = 0 \newline 3. srl Div & 0000 \newline 0000 \newline 0000                               & 01100000 \newline 01100000 \newline 00110000 & 11010110 \newline 00110110 \newline 00110110 \\ \hline
+2         & 1. Rem = Rem - Div \newline 2a. Rem \textgreater{}= 0, sll Q, Q0 = 1 \newline 3. srl Div          & 0000 \newline 0001 \newline 0001 & 00110000 \newline 00110000 \newline 00011000 & 00000110 \newline 00000110 \newline 00000110 \\ \hline
+3         & 1. Rem = Rem - Div \newline 2b. Rem \textless 0, Rem += Div, sll Q, Q0 = 0 \newline 3. srl Div & 0001 \newline 0010 \newline 0010 & 00011000 \newline 00011000 \newline 00001100 & 11101110 \newline 00000110 \newline 00000110 \\ \hline
+4         & 1. Rem = Rem - Div \newline 2b. Rem \textless 0, Rem += Div, sll Q, Q0 = 0 \newline 3. srl Div & 0010 \newline 0100 \newline 0100 & 00001100 \newline 00001100 \newline 00000110 & 11111010 \newline 00000110 \newline 00000110 \\ \hline
+5         & 1. Rem = Rem - Div \newline 2a. Rem \textgreater{}= 0, sll Q, Q0 = 1 \newline 3. srl Div          & 0100 \newline 1001 \newline \textcolor{red}{1001} & 00000110 \newline 00000110 \newline 00000011 & 00000000 \newline 00000000 \newline \textcolor{red}{00000000} \\ \hline
+\end{tabular}}
+\end{center}
+\end{table}
+
+\begin{problem}{3}
+Convert $-4563_{10}$ into a 32-bit two's complement binary number.
+\end{problem}
+
+\textit{Solution.}
+\begin{align*}
+    4563_{10} &\Longrightarrow 0000 0000 0000 0000 0001 0001 1101 0011_2 \tag*{(Convert to binary, ignore sign)} \\
+    &\Longrightarrow 1111 1111 1111 1111 1110 1110 0010 1100_2 \tag*{(Invert bits since negative)} \\
+    &\Longrightarrow 1111 1111 1111 1111 1110 1110 0010 1101_2 \tag*{(Add one)}
+\end{align*}
+
+\begin{problem}{4}
+What decimal number does this two's complement binary number represent: $1111 1111 1111 1111 1111 0011 1000 0011_2$?
+\end{problem}
+
+\textit{Solution.}
+\begin{align*}
+    1111 1111 1111 1111 1111 0011 1000 0011_2 & \Longrightarrow 0000 0000 0000 0000 0000 1100 0111 1100_2 \tag*{(Invert bits)} \\&\Longrightarrow 0000 0000 0000 0000 0000 1100 0111 1101_2 \tag*{(Add one)} \\
+    &\Longrightarrow -3197_{10}
+\end{align*}
+
+\begin{problem}{5}
+What would the number $18653.4140625_{10}$ be in IEEE 754 single precision floating point format?
+\end{problem}
+
+\textit{Solution.}
+
+\begin{align*}
+    18653_{10} &= 100100011011101_2 \\
+    0.4140625_{10} &= 0.0110101_2 \\
+    18653.4140625_{10} &= 100100011011101.0110101_2 \tag*{(Decimal to binary)} \\
+    &= 1.001000110111010110101_2 \times 2^{14} \tag*{(Normalized format)} \\
+    &= 1.001000110111010110101_2 \times 2^{141 - 127} \tag*{(With bias)} \\
+    141_{10} &= 10001101_2 \tag*{(Convert exponent to binary)}
+\end{align*}
+$$01000110100100011011101011010100_2 = \text{0x4691BAD4}$$
+
+\begin{problem}{6}
+What would the number $-18472.40625_{10}$ be in IEEE 754 single precision floating point format?
+\end{problem}
+
+\textit{Solution.}
+
+\begin{align*}
+    18472_{10} &= 100100000101000_2 \\
+    0.40625_{10} &= 0.01101_2 \\
+    18472.40625_{10} &= 100100000101000.01101_2 \tag*{(Decimal to binary)} \\
+    &= 1.0010000010100001101_2 \times 2^{14} \tag*{(Normalized format)} \\
+    &= 1.0010000010100001101_2 \times 2^{141 - 127} \tag*{(With bias)} \\
+    141_{10} &= 10001101_2 \tag*{(Convert exponent to binary)}
+\end{align*}
+$$11000110100100000101000011010000_2 = \text{0xC69050D0}$$
+
+\begin{problem}{7}
+What decimal number would the IEEE 754 single precision floating point number 0xC5A3B760 (this is in hex) be? Write your final answer in scientific notation as $m \times  10^p$ where $p$ is an integer.
+\end{problem}
+
+\textit{Solution.}
+\begin{align*}
+    0xC5A3B760 &= 1100 0101 1010 0011 1011 0111 0110 0000_2 \\
+    &\Longrightarrow -1.01000111011011101100000_2 \times 2^{12} \tag*{(Normalized format)} \\
+    &= -1.279033661_{10} \times 2^{12} \\
+    &= -5238.921875_{10} \\
+    &= -5.238921875_{10} \times 10^3
+\end{align*}
+
+
+\begin{problem}{8}
+For this problem, assume 5 bits precision. Add two binary numbers, $1.0011_{2} \times 2^{-8}$ and $1.0101_2 \times 2^{-6}$.
+\end{problem}
+
+\textit{Solution.}
+\begin{align*}
+    1.0011_2 \times 2^{-8} + 1.0101_2 \times 2^{-6} &= 0.010011_2 \times 2^{-6} + 1.0101_2 \times 2^{-6} \\
+    &= 1.100111_2 \times 2^{-6} \tag*{(No overflow/underflow)} \\ 
+    &= 1.1001_2 \times 2^{-6} \tag*{(Truncated)}
+\end{align*}
+
+\begin{problem}{9}
+For this problem, assume 5 bits precision. Multiply two binary numbers, $1.0011_2 \times 2^{-8}$ and $1.0101_2 \times 2^{-6}$.
+\end{problem}
+
+\begin{align*}
+    1.0011_2 \times 2^{-8} \times 1.0101_2 \times 2^{-6} &= 1.10001111_2 \times 2^{-14} \tag*{(No overflow/underflow)} \\
+    &= 1.1000_2 \times 2^{-14} \tag*{(Truncated)}
+\end{align*}
+
+\begin{problem}{10}
+Add $8.96_{10} \times 10^{10}$ to $6.87_{10} \times 10^8$,  assuming the following two different ways:
+
+\begin{itemize}
+    \item[(a)]  You have only three significant digits, first with guard (2 digits) and round digits.
+    
+    \textit{Solution.}
+    \begin{align*}
+    8.96_{10} \times 10^{10} + 6.87_{10} \times 10^8 &= 8.96_{10} \times 10^{10} + 0.06\textcolor{blue}{87}_{10} \times 10^{10} \tag*{(\textcolor{blue}{Guard digits})} \\
+    &= 9.02\textcolor{blue}{87}_{10} \times 10^{10} \tag*{(No overflow/underflow)} \\ 
+    &= 9.03_{10} \times 2^{10} \tag*{(Rounded)}
+\end{align*}
+    
+    \item[(b)] You have only three significant digits without guard and rounding.
+    
+        \textit{Solution.}
+    \begin{align*}
+    8.96_{10} \times 10^{10} + 6.87_{10} \times 10^8 &= 8.96_{10} \times 10^{10} + 0.0687_{10} \times 10^{10} \\
+    &= 9.0287_{10} \times 10^{10} \tag*{(No overflow/underflow)} \\ 
+    &= 9.02_{10} \times 2^{10} \tag*{(Truncated)}
+\end{align*}
+\end{itemize}
+\end{problem}
+
+
+\end{document}
