@@ -32,66 +32,70 @@ numbers:	.word	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ############################################################################
 main:
 	# get arraysize
-	la	$a0, msg1	# $a0 = address of msg1
-	li	$v0, 4		# $v0 = 4
-	syscall			# print msg1
-	li	$v0, 5		# $v0 = 5
-	syscall			# get arraysize
-	addi	$s0, $v0, 0	# $s0 = arraysize
-	la	$s1, numbers	# $s1 = base address of numbers
+	la	$a0, msg1			# $a0 = address of msg1
+	li	$v0, 4				# $v0 = 4
+	syscall					# print msg1
+	li	$v0, 5				# $v0 = 5
+	syscall					# get arraysize
+	slti	$t0, $v0, 15			# if $v0 < 15 then $t0 = 1, else $t0 = 0
+	bne	$t0, $zero, mainContinue	# jump to mainContinue if $v0 < 15
+	li	$v0, 15				# $v0 = 15		
 
+mainContinue:
+	addi	$s0, $v0, 0			# $s0 = arraySize
+	la	$s1, numbers			# $s1 = base address of numbers
 	# call readArray
-	addi 	$sp, $sp, -4	# $sp -= 4
-	sw	$ra, 0($sp)	# store $ra
-	jal	readArray	# jump to readArray and save position to $ra
-	lw	$ra, 0($sp)	# load $ra
-	addi	$sp, $sp, 4	# $sp += 4
+	addi 	$sp, $sp, -4			# $sp -= 4
+	sw	$ra, 0($sp)			# store $ra
+	jal	readArray			# jump to readArray and save position to $ra
+	lw	$ra, 0($sp)			# load $ra
+	addi	$sp, $sp, 4			# $sp += 4
 	
 	# print msg3
-	la	$a0, msg3	# $a0 = address of msg3
-	li	$v0, 4		# $v0 = 4
-	syscall			# print msg3
+	la	$a0, msg3			# $a0 = address of msg3
+	li	$v0, 4				# $v0 = 4
+	syscall					# print msg3
 
 	# call printArray
-	addi 	$sp, $sp, -4	# $sp -= 4
-	sw	$ra, 0($sp)	# store $ra
-	jal	printArray	# jump to printArray and save position to $ra
-	lw	$ra, 0($sp)	# load $ra
-	addi	$sp, $sp, 4	# $sp += 4
+	addi 	$sp, $sp, -4			# $sp -= 4
+	sw	$ra, 0($sp)			# store $ra
+	jal	printArray			# jump to printArray and save position to $ra
+	lw	$ra, 0($sp)			# load $ra
+	addi	$sp, $sp, 4			# $sp += 4
 
 	# find most appearances
-	addi 	$sp, $sp, -4	# $sp -= 4
-	sw	$ra, 0($sp)	# store $ra
-	jal	mostInArray	# jump to mostInArray and save position to $ra
-	lw	$ra, 0($sp)	# load $ra
-	addi	$sp, $sp, 4	# $sp += 4
+	addi 	$sp, $sp, -4			# $sp -= 4
+	sw	$ra, 0($sp)			# store $ra
+	jal	mostInArray			# jump to mostInArray and save position to $ra
+	lw	$ra, 0($sp)			# load $ra
+	addi	$sp, $sp, 4			# $sp += 4
 
 	# print most occurrences info
-	la	$a0, msg4	# $a0 = address of msg4
-	li	$v0, 4		# $v0 = 4
-	syscall			# print msg4
-	mov.s	$f12, $f4	# $f12 = $f4
-	li	$v0, 2		# $v0 = 2
-	syscall			# print $f12
-	la	$a0, msg5	# $a0 = address of msg5
-	li	$v0, 4		# $v0 = 4
-	syscall			# print msg5
-	move	$a0, $s2	# $a0 = $s2
-	li	$v0, 1		# $v0 = 1
-	syscall			# print $s2
-	la	$a0, msg6	# $a0 = address of msg6
-	li	$v0, 4		# $v0 = 4
-	syscall			# print msg1
+	la	$a0, msg4			# $a0 = address of msg4
+	li	$v0, 4				# $v0 = 4
+	syscall					# print msg4
+	mov.s	$f12, $f4			# $f12 = $f4
+	li	$v0, 2				# $v0 = 2
+	syscall					# print $f12
+	la	$a0, msg5			# $a0 = address of msg5
+	li	$v0, 4				# $v0 = 4
+	syscall					# print msg5
+	move	$a0, $s2			# $a0 = $s2
+	li	$v0, 1				# $v0 = 1
+	syscall					# print $s2
+	la	$a0, msg6			# $a0 = address of msg6
+	li	$v0, 4				# $v0 = 4
+	syscall					# print msg1
 
 	# printChangeArray
-	addi 	$sp, $sp, -4	# $sp -= 4
-	sw	$ra, 0($sp)	# store $ra
-	jal	printChangeArray	# jump to printChangeArray and save position to $ra
-	lw	$ra, 0($sp)	# load $ra
-	addi	$sp, $sp, 4	# $sp += 4
+	addi 	$sp, $sp, -4			# $sp -= 4
+	sw	$ra, 0($sp)			# store $ra
+	jal	printChangeArray		# jump to printChangeArray and save position to $ra
+	lw	$ra, 0($sp)			# load $ra
+	addi	$sp, $sp, 4			# $sp += 4
 
 	# exit program
-	jr	$ra		# jump to $ra
+	jr	$ra				# jump to $ra
 
 
 ############################################################################
